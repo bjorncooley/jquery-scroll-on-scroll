@@ -1,47 +1,58 @@
-var lastScrollTop;
+var direction;
 
 $(function(){
 
-    var direction = 'down';
 
-    lastScrollTop = 0;
-
-    $(window).on('scroll', scrollOnScroll);
+    $('body').css('overflow', 'hidden');
+    $(document).on('mousewheel DOMMouseScroll MozMousePixelScroll', scrollFunctions);
 });
+
+$(window).load(function(){
+
+    $(window).scrollTop(0);
+});
+
+function scrollFunctions() {
+
+    getScrollDirection();
+    scrollOnScroll();
+}
+
 
 function scrollOnScroll() {
 
+    if ( direction != undefined ) {
 
-    var windowTop = $(window).scrollTop();
-    var activeScrollSection = $('.scroll-target.active');
-    var scrollTarget = activeScrollSection.next('.scroll-target');
+        var activeScrollSection = $('.scroll-target.active');
 
-    if ( scrollTarget.length != 0 ) {
-        var scrollTargetTop = scrollTarget.offset().top;
-    }
-    
+        if ( !activeScrollSection.hasClass('animating') ) {
 
-    direction = getScrollDirection();
+            if ( direction == 'down' ) {
+                var scrollTarget = activeScrollSection.next('.scroll-target');
+            } else {
+                var scrollTarget = activeScrollSection.prev('.scroll-target');
+            }
 
-    if ( !activeScrollSection.hasClass('animating') ) {
+            if ( scrollTarget.length != 0 ) {
+                var scrollTargetTop = scrollTarget.offset().top;
+            }
 
-        $(window).off('scroll', scrollOnScroll);
-
-        if ( windowTop < scrollTargetTop && direction == 'down' ) {
+            console.log("Not animating");
+            console.log("Target: " + scrollTarget.text());
 
             activeScrollSection.addClass('animating');
 
-            $('html, body').stop().animate({ scrollTop: scrollTargetTop}, 1000, function() {
+            $('html, body').animate({ scrollTop: scrollTargetTop}, 1400, function() {
 
                 scrollTarget.addClass('active'); 
-                activeScrollSection.removeClass('active').removeClass('animating');
-                
-                // Clear/wait for residual scroll functions
-                $(window).clearQueue();
-                setTimeout(function(){
-                    $(window).on('scroll', scrollOnScroll);
-                }, 100);                
+                activeScrollSection.removeClass('active').removeClass('animating'); 
 
+                $(document).off('mousewheel DOMMouseScroll MozMousePixelScroll', scrollFunctions);  
+
+                setTimeout(function(){
+                    $(document).on('mousewheel DOMMouseScroll MozMousePixelScroll', scrollFunctions); 
+                }, 500); 
+                 
             });
         }
     }
@@ -49,15 +60,17 @@ function scrollOnScroll() {
 
 function getScrollDirection() {
 
-    var currentScrollTop = $(this).scrollTop();
-    var direction;
+    $('body').bind('mousewheel', function(e){
+        if(e.originalEvent.wheelDelta / 120 > 0) {
+            direction = 'up';
+        }
+        else{
+            direction = 'down';
+        }
+    });
+}
 
-    if ( currentScrollTop > lastScrollTop ) {
-        direction = 'down';
-    } else {
-       direction = 'up';
-    }
+function preventScroll(event) {
 
-    lastScrollTop = currentScrollTop;
-    return direction;
+    event.preventDefault();
 }
