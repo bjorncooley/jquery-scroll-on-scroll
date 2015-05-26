@@ -2,14 +2,8 @@ var direction;
 
 $(function(){
 
-
     $('body').css('overflow', 'hidden');
     $(document).on('mousewheel DOMMouseScroll MozMousePixelScroll', scrollFunctions);
-});
-
-$(window).load(function(){
-
-    $(window).scrollTop(0);
 });
 
 function scrollFunctions() {
@@ -17,7 +11,6 @@ function scrollFunctions() {
     getScrollDirection();
     scrollOnScroll();
 }
-
 
 function scrollOnScroll() {
 
@@ -36,9 +29,6 @@ function scrollOnScroll() {
             if ( scrollTarget.length != 0 ) {
                 var scrollTargetTop = scrollTarget.offset().top;
             }
-
-            console.log("Not animating");
-            console.log("Target: " + scrollTarget.text());
 
             activeScrollSection.addClass('animating');
 
@@ -68,9 +58,4 @@ function getScrollDirection() {
             direction = 'down';
         }
     });
-}
-
-function preventScroll(event) {
-
-    event.preventDefault();
 }
